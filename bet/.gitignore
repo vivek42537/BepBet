@@ -1,0 +1,27 @@
+# Node
+node_modules/
+dist/
+.cache/
+
+# Environment
+.env*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
+
+# Claude
+.claude/
+
+# Logs
+*.log

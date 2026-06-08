@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bet Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .nav {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav h1 {
+            font-size: 1.5rem;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .balance {
+            background-color: #27ae60;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .btn-primary { background-color: #3498db; color: white; }
+        .btn-success { background-color: #27ae60; color: white; }
+        .btn-danger { background-color: #e74c3c; color: white; }
+        .btn-secondary { background-color: #95a5a6; color: white; }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .card h2 {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+        }
+
+        .bet-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #95a5a6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge-success { background-color: #d4edda; color: #155724; }
+        .badge-warning { background-color: #fff3cd; color: #856404; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close {
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #7f8c8d;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .login-card {
+            background-color: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .login-card h1 {
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #95a5a6;
+        }
+
+        .entry-item {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .entry-item.winner {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
+
+        .entry-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Login View -->
+    <div id="loginView" class="login-container">
+        <div class="login-card">
+            <h1>🎲 Bet Platform</h1>
+            <p>Place friendly bets with your group!</p>
+            <p style="margin: 2rem 0; color: #e74c3c; font-weight: bold;">
+                ⚠️ OAuth not available in simple mode
+            </p>
+            <div class="form-group">
+                <label>Demo Login (Email):</label>
+                <input type="email" id="demoEmail" placeholder="your-email@example.com" value="demo@example.com">
+            </div>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="demoName" placeholder="Your Name" value="Demo User">
+            </div>
+            <button class="btn-primary" onclick="demoLogin()">Login (Demo Mode)</button>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #7f8c8d;">
+                In production, this would use Google OAuth
+            </p>
+        </div>
+    </div>
+
+    <!-- Main App View -->
+    <div id="mainView" class="hidden">
+        <nav class="nav">
+            <h1>🎲 Bet Platform</h1>
+            <div class="nav-user">
+                <span id="userName"></span>
+                <span class="balance" id="userBalance">$0.00</span>
+                <button class="btn-secondary" onclick="showProfile()">Profile</button>
+                <button class="btn-secondary" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="toolbar">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('active')">Active Bets</button>
+                    <button class="tab" onclick="switchTab('settled')">Settled Bets</button>
+                </div>
+                <button class="btn-success" onclick="showCreateBet()">+ Create Bet</button>
+            </div>
+
+            <div id="betsContainer"></div>
+        </div>
+    </div>
+
+    <!-- Profile View -->
+    <div id="profileView" class="hidden">
+        <nav class="nav">
+            <h1>🎲 Bet Platform</h1>
+            <div class="nav-user">
+                <span id="profileUserName"></span>
+                <span class="balance" id="profileBalance">$0.00</span>
+                <button class="btn-secondary" onclick="showMain()">Back</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="card">
+                <h2>Profile</h2>
+                <div style="margin-top: 1rem;">
+                    <p><strong>Name:</strong> <span id="profileName"></span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                    <p><strong>Balance:</strong> $<span id="profileBalanceAmount"></span></p>
+                    <p><strong>Admin:</strong> <span id="profileAdmin"></span></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Transaction History</h2>
+                <div id="transactionsContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Bet Modal -->
+<div id="createBetModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create New Bet</h2>
+            <button class="close" onclick="closeModal('createBetModal')">&times;</button>
+        </div>
+        <form onsubmit="createBet(event)">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="betTitle" placeholder="e.g., John's Golf Score Today" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="betDescription" placeholder="e.g., Will John shoot above 90?" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Entry Fee ($)</label>
+                <input type="number" step="0.01" min="0.01" id="betEntryFee" placeholder="10.00" required>
+            </div>
+            <div id="createBetError" class="error hidden"></div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closeModal('createBetModal')">Cancel</button>
+                <button type="submit" class="btn-success">Create Bet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bet Details Modal -->
+<div id="betDetailsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="detailsTitle"></h2>
+            <button class="close" onclick="closeModal('betDetailsModal')">&times;</button>
+        </div>
+        <div id="betDetailsContent"></div>
+    </div>
+</div>
+
+<!-- Enter Bet Modal -->
+<div id="enterBetModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Enter Bet</h2>
+            <button class="close" onclick="closeModal('enterBetModal')">&times;</button>
+        </div>
+        <div id="enterBetInfo"></div>
+        <form onsubmit="enterBet(event)">
+            <div class="form-group">
+                <label>Your Prediction</label>
+                <textarea id="predictionText" placeholder="Enter your prediction or stance..." required></textarea>
+            </div>
+            <div id="enterBetError" class="error hidden"></div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closeModal('enterBetModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Submit Entry</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Settle Bet Modal -->
+<div id="settleBetModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Settle Bet</h2>
+            <button class="close" onclick="closeModal('settleBetModal')">&times;</button>
+        </div>
+        <div id="settleBetInfo"></div>
+        <form onsubmit="settleBet(event)">
+            <div class="form-group">
+                <label>Select Winner(s)</label>
+                <div id="settleBetEntries"></div>
+            </div>
+            <div id="settleBetError" class="error hidden"></div>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button type="button" class="btn-secondary" onclick="closeModal('settleBetModal')">Cancel</button>
+                <button type="submit" class="btn-danger">Settle Bet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const API_URL = 'http://localhost:8000';
+let currentUser = null;
+let currentTab = 'active';
+let currentBet = null;
+
+// Demo login
+async function demoLogin() {
+    const email = document.getElementById('demoEmail').value;
+    const name = document.getElementById('demoName').value;
+
+    // Create a demo user via API
+    try {
+        const response = await fetch(`${API_URL}/users/me`, {
+            headers: {
+                'Authorization': `Bearer demo-token-${email}`
+            }
+        });
+
+        if (!response.ok) {
+            // User doesn't exist, create them in memory
+            currentUser = {
+                id: 'demo-' + Date.now(),
+                email: email,
+                name: name,
+                balance: 100.00,
+                is_admin: true,
+                created_at: new Date().toISOString()
+            };
+            localStorage.setItem('token', `demo-token-${email}`);
+            localStorage.setItem('user', JSON.stringify(currentUser));
+        }
+    } catch (error) {
+        // Create demo user
+        currentUser = {
+            id: 'demo-' + Date.now(),
+            email: email,
+            name: name,
+            balance: 100.00,
+            is_admin: true,
+            created_at: new Date().toISOString()
+        };
+        localStorage.setItem('token', `demo-token-${email}`);
+        localStorage.setItem('user', JSON.stringify(currentUser));
+    }
+
+    showMain();
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    currentUser = null;
+    document.getElementById('loginView').classList.remove('hidden');
+    document.getElementById('mainView').classList.add('hidden');
+}
+
+function showMain() {
+    document.getElementById('profileView').classList.add('hidden');
+    document.getElementById('mainView').classList.remove('hidden');
+    updateUI();
+    loadBets();
+}
+
+function showProfile() {
+    document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('profileView').classList.remove('hidden');
+    updateProfileUI();
+    loadTransactions();
+}
+
+function updateUI() {
+    if (!currentUser) {
+        const stored = localStorage.getItem('user');
+        if (stored) {
+            currentUser = JSON.parse(stored);
+        }
+    }
+
+    if (currentUser) {
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userBalance').textContent = `$${Number(currentUser.balance).toFixed(2)}`;
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('mainView').classList.remove('hidden');
+    }
+}
+
+function updateProfileUI() {
+    if (currentUser) {
+        document.getElementById('profileUserName').textContent = currentUser.name;
+        document.getElementById('profileBalance').textContent = `$${Number(currentUser.balance).toFixed(2)}`;
+        document.getElementById('profileName').textContent = currentUser.name;
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        document.getElementById('profileBalanceAmount').textContent = Number(currentUser.balance).toFixed(2);
+        document.getElementById('profileAdmin').textContent = currentUser.is_admin ? 'Yes' : 'No';
+    }
+}
+
+async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('token');
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+        }
+    };
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...options.headers
+        }
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Request failed');
+    }
+
+    return response.json();
+}
+
+async function loadBets() {
+    try {
+        const bets = await apiCall(`/bets?status=${currentTab}`);
+        const container = document.getElementById('betsContainer');
+
+        if (bets.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>No bets yet</p></div>';
+            return;
+        }
+
+        container.innerHTML = bets.map(bet => `
+            <div class="card" onclick="showBetDetails('${bet.id}')">
+                <h2>${bet.title}</h2>
+                <p>${bet.description}</p>
+                <div class="bet-meta">
+                    <span>Entry Fee: $${Number(bet.entry_fee).toFixed(2)}</span>
+                    <span>Pool: $${Number(bet.total_pool).toFixed(2)}</span>
+                    <span>Entries: ${bet.entry_count}</span>
+                    <span>By: ${bet.creator_name}</span>
+                    <span class="badge ${bet.status === 'active' ? 'badge-success' : 'badge-warning'}">
+                        ${bet.status.toUpperCase()}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Failed to load bets:', error);
+        document.getElementById('betsContainer').innerHTML =
+            `<div class="empty-state"><p>Error loading bets: ${error.message}</p></div>`;
+    }
+}
+
+async function showBetDetails(betId) {
+    try {
+        const bet = await apiCall(`/bets/${betId}`);
+        const entries = await apiCall(`/bets/${betId}/entries`);
+        currentBet = { ...bet, entries };
+
+        const userHasEntered = entries.some(e => e.user_id === currentUser.id);
+
+        document.getElementById('detailsTitle').textContent = bet.title;
+        document.getElementById('betDetailsContent').innerHTML = `
+            <p>${bet.description}</p>
+            <div class="bet-meta" style="margin: 1rem 0;">
+                <span>Entry Fee: $${Number(bet.entry_fee).toFixed(2)}</span>
+                <span>Pool: $${Number(bet.total_pool).toFixed(2)}</span>
+                <span>Entries: ${bet.entry_count}</span>
+            </div>
+            ${bet.status === 'active' && !userHasEntered ?
+                '<button class="btn-primary" onclick="showEnterBet()">Enter Bet</button>' : ''}
+            ${bet.status === 'active' && currentUser.is_admin && entries.length > 0 ?
+                '<button class="btn-danger" onclick="showSettleBet()" style="margin-left: 0.5rem;">Settle Bet</button>' : ''}
+            <h3 style="margin-top: 1.5rem;">Entries (${entries.length})</h3>
+            ${entries.length === 0 ?
+                '<div class="empty-state"><p>No entries yet</p></div>' :
+                entries.map(entry => `
+                    <div class="entry-item ${entry.is_winner === true ? 'winner' : ''}">
+                        <div>
+                            <strong>${entry.user_name}</strong>
+                            <p style="margin: 0.25rem 0 0 0; color: #7f8c8d;">${entry.prediction}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div>$${Number(entry.amount).toFixed(2)}</div>
+                            ${entry.is_winner === true ?
+                                '<span class="badge badge-success">WINNER</span>' : ''}
+                        </div>
+                    </div>
+                `).join('')
+            }
+        `;
+
+        document.getElementById('betDetailsModal').classList.add('show');
+    } catch (error) {
+        alert('Failed to load bet details: ' + error.message);
+    }
+}
+
+function showCreateBet() {
+    document.getElementById('betTitle').value = '';
+    document.getElementById('betDescription').value = '';
+    document.getElementById('betEntryFee').value = '';
+    document.getElementById('createBetError').classList.add('hidden');
+    document.getElementById('createBetModal').classList.add('show');
+}
+
+async function createBet(event) {
+    event.preventDefault();
+
+    try {
+        await apiCall('/bets', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: document.getElementById('betTitle').value,
+                description: document.getElementById('betDescription').value,
+                entry_fee: parseFloat(document.getElementById('betEntryFee').value)
+            })
+        });
+
+        closeModal('createBetModal');
+        loadBets();
+    } catch (error) {
+        document.getElementById('createBetError').textContent = error.message;
+        document.getElementById('createBetError').classList.remove('hidden');
+    }
+}
+
+function showEnterBet() {
+    document.getElementById('enterBetInfo').innerHTML = `
+        <div style="margin-bottom: 1rem;">
+            <h3>${currentBet.title}</h3>
+            <p>${currentBet.description}</p>
+            <p style="font-weight: bold;">Entry Fee: $${Number(currentBet.entry_fee).toFixed(2)}</p>
+        </div>
+    `;
+    document.getElementById('predictionText').value = '';
+    document.getElementById('enterBetError').classList.add('hidden');
+    closeModal('betDetailsModal');
+    document.getElementById('enterBetModal').classList.add('show');
+}
+
+async function enterBet(event) {
+    event.preventDefault();
+
+    try {
+        await apiCall('/entries', {
+            method: 'POST',
+            body: JSON.stringify({
+                bet_id: currentBet.id,
+                prediction: document.getElementById('predictionText').value
+            })
+        });
+
+        closeModal('enterBetModal');
+        // Refresh user balance
+        const user = await apiCall('/users/me');
+        currentUser = user;
+        localStorage.setItem('user', JSON.stringify(user));
+        updateUI();
+        loadBets();
+        alert('Entry submitted successfully!');
+    } catch (error) {
+        document.getElementById('enterBetError').textContent = error.message;
+        document.getElementById('enterBetError').classList.remove('hidden');
+    }
+}
+
+function showSettleBet() {
+    const totalPool = currentBet.entries.reduce((sum, e) => sum + Number(e.amount), 0);
+
+    document.getElementById('settleBetInfo').innerHTML = `
+        <div style="margin-bottom: 1rem;">
+            <h3>${currentBet.title}</h3>
+            <p>Total Pool: $${totalPool.toFixed(2)}</p>
+        </div>
+    `;
+
+    document.getElementById('settleBetEntries').innerHTML = currentBet.entries.map(entry => `
+        <div class="entry-item" style="cursor: pointer; margin-bottom: 0.5rem;"
+             onclick="toggleWinner(this, '${entry.id}')">
+            <div>
+                <strong>${entry.user_name}</strong>
+                <p style="margin: 0.25rem 0 0 0; color: #7f8c8d;">${entry.prediction}</p>
+            </div>
+            <input type="checkbox" value="${entry.id}" onclick="event.stopPropagation()">
+        </div>
+    `).join('');
+
+    document.getElementById('settleBetError').classList.add('hidden');
+    closeModal('betDetailsModal');
+    document.getElementById('settleBetModal').classList.add('show');
+}
+
+function toggleWinner(element, entryId) {
+    const checkbox = element.querySelector('input[type="checkbox"]');
+    checkbox.checked = !checkbox.checked;
+    element.style.backgroundColor = checkbox.checked ? '#d4edda' : 'white';
+    element.style.borderColor = checkbox.checked ? '#28a745' : '#ddd';
+}
+
+async function settleBet(event) {
+    event.preventDefault();
+
+    const checkboxes = document.querySelectorAll('#settleBetEntries input[type="checkbox"]:checked');
+    const winningEntryIds = Array.from(checkboxes).map(cb => cb.value);
+
+    if (winningEntryIds.length === 0) {
+        document.getElementById('settleBetError').textContent = 'Please select at least one winner';
+        document.getElementById('settleBetError').classList.remove('hidden');
+        return;
+    }
+
+    try {
+        await apiCall(`/bets/${currentBet.id}/settle`, {
+            method: 'POST',
+            body: JSON.stringify({
+                winning_entry_ids: winningEntryIds
+            })
+        });
+
+        closeModal('settleBetModal');
+        // Refresh user balance
+        const user = await apiCall('/users/me');
+        currentUser = user;
+        localStorage.setItem('user', JSON.stringify(user));
+        updateUI();
+        loadBets();
+        alert('Bet settled successfully!');
+    } catch (error) {
+        document.getElementById('settleBetError').textContent = error.message;
+        document.getElementById('settleBetError').classList.remove('hidden');
+    }
+}
+
+async function loadTransactions() {
+    try {
+        const transactions = await apiCall('/users/me/transactions');
+        const container = document.getElementById('transactionsContainer');
+
+        if (transactions.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>No transactions yet</p></div>';
+            return;
+        }
+
+        container.innerHTML = transactions.map(tx => `
+            <div style="padding: 1rem; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: bold;">${tx.bet_title}</div>
+                    <div style="font-size: 0.9rem; color: #7f8c8d; margin-top: 0.25rem;">
+                        ${tx.type === 'bet_entry' ? 'Bet Entry' : 'Payout'}
+                    </div>
+                    <div style="font-size: 0.8rem; color: #95a5a6; margin-top: 0.25rem;">
+                        ${new Date(tx.created_at).toLocaleString()}
+                    </div>
+                </div>
+                <div style="font-size: 1.2rem; font-weight: bold; color: ${Number(tx.amount) > 0 ? '#27ae60' : '#e74c3c'};">
+                    ${Number(tx.amount) > 0 ? '+' : ''}$${Number(tx.amount).toFixed(2)}
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Failed to load transactions:', error);
+    }
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    loadBets();
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+}
+
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        const stored = localStorage.getItem('user');
+        if (stored) {
+            currentUser = JSON.parse(stored);
+            showMain();
+        }
+    }
+});
+</script>
+
+</body>
+</html>
